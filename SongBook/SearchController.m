@@ -9,7 +9,7 @@
 
 @implementation SearchController
 
-@synthesize delegate=_delegate;
+@synthesize delegate=_delegate, searchDisplayer=_searchDisplayer;
 
 - (void)viewDidLoad {
 	//NSLog(@"viewDidLoad %i", self.tableView.hidden);
@@ -21,19 +21,29 @@
 	filteredSongs = [[NSMutableArray alloc] initWithCapacity:0];
 }
 
-- (void)setSongsMatchingString:(NSString *)str {
+- (void)setSongsMatchingString:(NSTimer *)timer {
+	NSLog(@"searching for '%@'", timer.userInfo);
 	[filteredSongs removeAllObjects];
+	if ( ! timer.userInfo || [timer.userInfo length] < 2) {
+		return [self reloadSearchResults];
+	}
 	// Core Data
 	NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
 	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Verse" inManagedObjectContext:managedObjectContext];
 	[request setEntity:entity];
-	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"text contains[cd] %@", str, str];
+	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"text contains[cd] %@", timer.userInfo];
 	[request setPredicate:predicate];
 	
 	NSError *error;
 	NSArray *array = [managedObjectContext executeFetchRequest:request error:&error];
 	
-	if (array != nil && [array count] > 0) {
+	if (array != nil) {
+		if ([array count] == 0) {
+			[_searchDisplayer.searchResultsTableView reloadData];
+			[delay release];
+			delay = nil;
+			return;
+		}
 		// Pare down the result to unique songs
 		/*for (Verse *verse in [array valueForKeyPath:@"@distinctUnionOfObjects.song"]) {
 			[filteredSongs addObject:verse.song];
@@ -46,6 +56,10 @@
 		[sortDescriptor release];
 		[sortDescriptors release];
 	}
+	[_searchDisplayer.searchResultsTableView reloadData];
+	[delay invalidate];
+	[delay release];
+	delay = nil;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -126,30 +140,53 @@
 #pragma mark UISearchDisplayController Delegate Methods
 
 - (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString {
-	//NSLog(@"shouldReloadTableForSearchString");
-    return YES;
+    return NO;
 }
 
 
-- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchScope:(NSInteger)searchOption {
-	//NSLog(@"shouldReloadTableForSearchScope");
-    return YES;
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+	[NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(setSongsMatchingString:) userInfo:searchBar.text repeats:NO];
+}
+
+- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
+	[NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(setSongsMatchingString:) userInfo:searchBar.text repeats:NO];
 }
 
 #pragma mark -
 #pragma mark Search Bar
 
 - (void)searchBar:(UISearchBar *)theSearchBar textDidChange:(NSString *)searchText {
-	//NSLog(@"textDidChange");
-	[self setSongsMatchingString:searchText];
+	//NSLog(@"textDidChange to %@", searchText);
+	//[self setSongsMatchingString:searchText];
+	if (delay)
+	{
+		// Kill the old timer dead
+		[delay invalidate];
+		[delay release];
+		delay = nil;
+	}
+	
+	delay = [[NSTimer scheduledTimerWithTimeInterval:0.75 target:self selector:@selector(setSongsMatchingString:) userInfo:searchText repeats:NO] retain];
+}
+
+- (void)reloadSearchResults
+{
+	[_searchDisplayer.searchResultsTableView reloadData];
+	if (delay) {
+		[delay invalidate];
+		[delay release];
+		delay = nil;
+	}
 }
 
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+	[filteredSongs removeAllObjects];
+	//[self reloadSearchResults];
 	[_delegate.numberField becomeFirstResponder];
 }
 
 - (void)dealloc {
-	[filteredSongs dealloc];
+	[filteredSongs release];
     [super dealloc];
 }
 

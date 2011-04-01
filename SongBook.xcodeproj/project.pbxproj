@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4F34FABE1330B12F00E9C605 /* SongBookData.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 4F34FABD1330B12F00E9C605 /* SongBookData.sqlite */; };
+		4F0E70DA1335BF0A00B3F1D5 /* SongController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F0E70D91335BF0A00B3F1D5 /* SongController.m */; };
 		4F4D6634132DE86300B542D9 /* bookmarkedIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4F4D6632132DE86300B542D9 /* bookmarkedIcon.png */; };
 		4F4D6635132DE86300B542D9 /* bookmarkIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4F4D6633132DE86300B542D9 /* bookmarkIcon.png */; };
 		4F78FBF1132DC911009590E2 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F78FBF0132DC911009590E2 /* UIKit.framework */; };
@@ -38,6 +38,7 @@
 		4F79C6F5133001FF00D55069 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F79C6F4133001FE00D55069 /* QuartzCore.framework */; };
 		4FE1089B1330856700E74353 /* bookmarkedIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4FE108991330856700E74353 /* bookmarkedIcon@2x.png */; };
 		4FE1089C1330856700E74353 /* bookmarkIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4FE1089A1330856700E74353 /* bookmarkIcon@2x.png */; };
+		4FF446D5134679E00042CE5B /* SongBookData.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 4FF446D4134679E00042CE5B /* SongBookData.sqlite */; };
 		4FFFC52013304861005B88C9 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 4FFFC51F13304861005B88C9 /* Default.png */; };
 		4FFFC5221330488F005B88C9 /* Icon_greenbook.png in Resources */ = {isa = PBXBuildFile; fileRef = 4FFFC5211330488F005B88C9 /* Icon_greenbook.png */; };
 		4FFFC524133048BA005B88C9 /* SongBookIcon_57.png in Resources */ = {isa = PBXBuildFile; fileRef = 4FFFC523133048BA005B88C9 /* SongBookIcon_57.png */; };
@@ -55,7 +56,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		4F34FABD1330B12F00E9C605 /* SongBookData.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = SongBookData.sqlite; sourceTree = "<group>"; };
+		4F0E70D81335BF0A00B3F1D5 /* SongController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SongController.h; sourceTree = "<group>"; };
+		4F0E70D91335BF0A00B3F1D5 /* SongController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SongController.m; sourceTree = "<group>"; };
 		4F4D6632132DE86300B542D9 /* bookmarkedIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bookmarkedIcon.png; sourceTree = "<group>"; };
 		4F4D6633132DE86300B542D9 /* bookmarkIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bookmarkIcon.png; sourceTree = "<group>"; };
 		4F78FBEC132DC911009590E2 /* SongBook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SongBook.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,6 +97,7 @@
 		4F79C6F4133001FE00D55069 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		4FE108991330856700E74353 /* bookmarkedIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bookmarkedIcon@2x.png"; sourceTree = "<group>"; };
 		4FE1089A1330856700E74353 /* bookmarkIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bookmarkIcon@2x.png"; sourceTree = "<group>"; };
+		4FF446D4134679E00042CE5B /* SongBookData.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = SongBookData.sqlite; sourceTree = "<group>"; };
 		4FFFC51F13304861005B88C9 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		4FFFC5211330488F005B88C9 /* Icon_greenbook.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon_greenbook.png; sourceTree = "<group>"; };
 		4FFFC523133048BA005B88C9 /* SongBookIcon_57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SongBookIcon_57.png; sourceTree = "<group>"; };
@@ -142,7 +145,7 @@
 		4F4D6631132DE85300B542D9 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				4F34FABD1330B12F00E9C605 /* SongBookData.sqlite */,
+				4FF446D4134679E00042CE5B /* SongBookData.sqlite */,
 				4FE108991330856700E74353 /* bookmarkedIcon@2x.png */,
 				4FE1089A1330856700E74353 /* bookmarkIcon@2x.png */,
 				4FFFC52513304902005B88C9 /* Default@2x.png */,
@@ -207,6 +210,8 @@
 				4F78FC10132DC911009590E2 /* SongViewController.m */,
 				4F78FC04132DC911009590E2 /* SongBook.xcdatamodeld */,
 				4F78FBF9132DC911009590E2 /* Supporting Files */,
+				4F0E70D81335BF0A00B3F1D5 /* SongController.h */,
+				4F0E70D91335BF0A00B3F1D5 /* SongController.m */,
 			);
 			path = SongBook;
 			sourceTree = "<group>";
@@ -325,7 +330,7 @@
 				4FFFC52613304902005B88C9 /* Default@2x.png in Resources */,
 				4FE1089B1330856700E74353 /* bookmarkedIcon@2x.png in Resources */,
 				4FE1089C1330856700E74353 /* bookmarkIcon@2x.png in Resources */,
-				4F34FABE1330B12F00E9C605 /* SongBookData.sqlite in Resources */,
+				4FF446D5134679E00042CE5B /* SongBookData.sqlite in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -370,6 +375,7 @@
 				4F78FC4B132DE0A7009590E2 /* SearchController.m in Sources */,
 				4F79C6D3132F26AA00D55069 /* Verse.m in Sources */,
 				4F79C6D6132F26AA00D55069 /* Song.m in Sources */,
+				4F0E70DA1335BF0A00B3F1D5 /* SongController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

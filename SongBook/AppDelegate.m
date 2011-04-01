@@ -1,5 +1,5 @@
 //
-//  SongBookAppDelegate.m
+//  AppDelegate.m
 //  SongBook
 //
 //  Created by Kelly Banman on 11-03-13.
@@ -34,10 +34,11 @@
         
 		[[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"firstLaunch"];
 	}
-    
+	    
     // Add the main view controller's view to the window and display.
     self.window.rootViewController = self.chooserController;
     [self.window makeKeyAndVisible];
+	
     return YES;
 }
 
@@ -91,7 +92,7 @@
 {
     /*
      Typically you should set up the Core Data stack here, usually by passing the managed object context to the first view controller.
-     self.<#View controller#>.managedObjectContext = self.managedObjectContext;
+     self..managedObjectContext = self.managedObjectContext;
     */
 }
 
@@ -161,9 +162,8 @@
     {
         return __persistentStoreCoordinator;
     }
-    
-    //NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"SongBook.sqlite"];
-    NSURL *storeURL = [[[NSBundle mainBundle] resourceURL] URLByAppendingPathComponent:@"SongBookData.sqlite"];
+	
+	NSURL *storeURL = [[[NSBundle mainBundle] resourceURL] URLByAppendingPathComponent:DATASTORE];
 	
     NSError *error = nil;
     __persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];

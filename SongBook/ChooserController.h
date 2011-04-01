@@ -1,5 +1,5 @@
 //
-//  MainViewController.h
+//  ChooserController.h
 //  SongBook
 //
 //  Created by Kelly Banman on 11-03-13.
@@ -9,10 +9,10 @@
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
 
-@class SearchController, BookmarksController, SongViewController;
+@class SearchController, BookmarksController, SongController;
 
 @interface ChooserController : UIViewController {
-    SongViewController *songView;
+    SongController *songView;
 	BOOL isShaking;
 }
 
@@ -21,7 +21,7 @@
 - (IBAction)userTouchedGo:(id)sender;
 - (IBAction)showBookmarksController:(id)sender;
 - (void)modalControllerDidFinishWithSongNumber:(NSNumber *)number;
-- (void)songViewControllerDidFinish:(SongViewController *)controller;
+- (void)songControllerDidFinish:(SongController *)controller;
 
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain) SearchController *searchController;

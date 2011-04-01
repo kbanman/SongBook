@@ -1,5 +1,5 @@
 //
-//  SongBookAppDelegate.h
+//  AppDelegate.h
 //  SongBook
 //
 //  Created by Kelly Banman on 11-03-13.

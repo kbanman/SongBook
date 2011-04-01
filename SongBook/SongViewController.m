@@ -1,5 +1,5 @@
 //
-//  FlipsideViewController.m
+//  SongViewController.m
 //  SongBook
 //
 //  Created by Kelly Banman on 11-03-13.
@@ -8,7 +8,7 @@
 
 #import "SongViewController.h"
 #import "AppDelegate.h"
-#import "ChooserController.h"
+#import "SongController.h"
 #import "Song.h"
 #import "Verse.h"
 
@@ -17,7 +17,7 @@
 @synthesize	  delegate=_delegate, 
 		bookmarkButton=_bookmarkButton, 
 			songNumber=_songNumber, 
-		   isPopulated=_isPopulated, 
+//		   isPopulated=_isPopulated, 
 		   currentSong=_song,
 			  titleBar=_titleBar;
 
@@ -42,7 +42,7 @@
 
 #pragma mark - Song Methods
 - (void)layoutVerses {
-	[self layoutVerses:(self.interfaceOrientation != UIInterfaceOrientationPortrait)];
+	[self layoutVerses:(self.delegate.interfaceOrientation != UIInterfaceOrientationPortrait)];
 }
 - (void)layoutVerses:(BOOL)landscape {
 	//NSLog(@"layoutVerses %i",landscape);
@@ -52,7 +52,7 @@
         [_bookmarkButton setImage:[UIImage imageNamed:@"bookmarkIcon.png"]];
     }
 	
-	_songNumber.text = [_song.number stringValue];
+	self.songNumber.text = [_song.number stringValue];
 	
     // Get rid of all the current stuff
     for (UIView *subview in self.view.subviews) {
@@ -87,7 +87,9 @@
 		numFont = [UIFont fontWithName:@"Baskerville-Bold" size:20.0];
 		verseFont = [UIFont fontWithName:@"Baskerville" size:19.0];
 	}
-    CGFloat num_height = [@"00" sizeWithFont:numFont].height;
+	
+    CGFloat num_height = [@"00" sizeWithFont:numFont].height,
+			verse_inner_padding = verseFont.pointSize/2.0;
     
     for (Verse *verse in [_song getVerses]) {
         //NSLog(@"%@", verse.text);
@@ -110,9 +112,9 @@
 			total_height += num_height;
 		}
         CGSize testSize = [verse.text sizeWithFont:verseFont 
-								 constrainedToSize:CGSizeMake(verse_width, CGFLOAT_MAX) 
+								 constrainedToSize:CGSizeMake(verse_width - verse_inner_padding, CGFLOAT_MAX) 
 									 lineBreakMode:UILineBreakModeWordWrap];
-        CGRect verseFrame = CGRectMake(verse_left, total_height+verse_top, verse_width, testSize.height + 10.0);
+        CGRect verseFrame = CGRectMake(verse_left, total_height+verse_top, verse_width+4.0, testSize.height + 10.0);
         total_height += verse_top + verseFrame.size.height;
 		
         UITextView *verseLabel = [[UITextView alloc] initWithFrame:verseFrame];
@@ -131,50 +133,12 @@
     [(UIScrollView *)self.view setContentSize:CGSizeMake([[UIScreen mainScreen] bounds].size.width, total_height+padding_bottom)];
 }
 
-- (void)setSong:(NSNumber *)number {
-    // Core Data
-	NSManagedObjectContext *managedObjectContext = [(AppDelegate *)[[UIApplication sharedApplication] delegate] managedObjectContext];
-	NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
-	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Song" inManagedObjectContext:managedObjectContext];
-	[request setEntity:entity];
-	// Specify Song
-	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"number == %i", [number intValue]];
-	[request setPredicate:predicate];
-	
-	NSError *error;
-	NSArray *array = [managedObjectContext executeFetchRequest:request error:&error];
-	if(array != nil && [array count] == 1) {
-        _song = [[array objectAtIndex:0] retain];
-		//[self layoutVerses];
-		_isPopulated = YES;
-    } else {
-        NSLog(@"Song %@ not found!", number);
-		_isPopulated = NO;
-    }
-    //[request release];
-}
-
-
-
-
 
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-	// Swipe right
-	UISwipeGestureRecognizer *recognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeFrom:)];
-	
-	[self.view addGestureRecognizer:recognizer];
-	[recognizer release];
-	
-	// Swipe left
-	recognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeFrom:)];
-    recognizer.direction = UISwipeGestureRecognizerDirectionLeft;
-	[self.view addGestureRecognizer:recognizer];
-	[recognizer release];
 	
 	// tint the title bar
 	_titleBar.tintColor = NAVBARCOLOUR;
@@ -187,74 +151,44 @@
     // e.g. self.myOutlet = nil;
 }
 
-
+/*
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait ||
-			interfaceOrientation == UIInterfaceOrientationLandscapeLeft || 
-			interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+    return YES;
 }
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration 
-{
+{	
+	NSLog(@"SVC willAnimateRotationToInterfaceOrientation");
 	if (duration > 0) {
 		//NSLog(@"%f = %f",duration,duration/2);
 		[self layoutVerses:(toInterfaceOrientation != UIInterfaceOrientationPortrait)];
 	}
 }
+*/
 
 #pragma mark - Actions
 
-- (IBAction)showSongChooser:(id)sender
+- (void)setSong:(Song *)song
 {
-    [_delegate songViewControllerDidFinish:self];
+	_song = [song retain];
+	[self layoutVerses];
+}
+
+- (IBAction)showChooser:(id)sender
+{
+    [_delegate showChooser:sender];
 }
 - (IBAction)bookmarkButtonTapped:(id)sender {
-    if (self.isPopulated){
-		if ([(AppDelegate *)[[UIApplication sharedApplication] delegate] bookmarkExistsForNumber:_song.number]){
-			[(AppDelegate *)[[UIApplication sharedApplication] delegate] deleteBookmarkForNumber:_song.number];
-			[_bookmarkButton setImage:[UIImage imageNamed:@"bookmarkIcon.png"]];
-		} else {
-			[(AppDelegate *)[[UIApplication sharedApplication] delegate] addBookmarkForNumber:_song.number withTitle:[_song getFirstLine]];
-			[_bookmarkButton setImage:[UIImage imageNamed:@"bookmarkedIcon.png"]];
-		}
-	}
-}
-
-#pragma mark - Gestures and paging
-
-- (void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer {
-	//NSLog(@"swipe %i", recognizer.direction);
-    if (recognizer.direction == UISwipeGestureRecognizerDirectionLeft) {
-        [self nextSong];
-    } else {
-		[self prevSong];
-    }
-}
-
-- (void)nextSong {
-	NSNumber *oldNumber = _song.number;
-	NSNumber *newNumber = [NSNumber numberWithInt:[_song.number intValue]+1];
-	[self setSong:newNumber];
-	if (self.isPopulated) {
-		[self layoutVerses];
+	if ([(AppDelegate *)[[UIApplication sharedApplication] delegate] bookmarkExistsForNumber:_song.number]){
+		[(AppDelegate *)[[UIApplication sharedApplication] delegate] deleteBookmarkForNumber:_song.number];
+		[_bookmarkButton setImage:[UIImage imageNamed:@"bookmarkIcon.png"]];
 	} else {
-		// Revert to old number
-		[self setSong:oldNumber];
+		[(AppDelegate *)[[UIApplication sharedApplication] delegate] addBookmarkForNumber:_song.number withTitle:[_song getFirstLine]];
+		[_bookmarkButton setImage:[UIImage imageNamed:@"bookmarkedIcon.png"]];
 	}
 }
 
 
-- (void)prevSong {
-	NSNumber *oldNumber = _song.number;
-	NSNumber *newNumber = [NSNumber numberWithInt:[_song.number intValue]-1];
-	[self setSong:newNumber];
-	if (self.isPopulated) {
-		[self layoutVerses];
-	} else {
-		// Revert to old number
-		[self setSong:oldNumber];
-	}
-}
 @end

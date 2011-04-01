@@ -9,13 +9,19 @@
 #import "ChooserController.h"
 #import "SearchController.h"
 #import "BookmarksController.h"
+#import "SongController.h"
 #import "SongViewController.h"
 #import <QuartzCore/QuartzCore.h>
 #import "Song.h"
 
 @implementation ChooserController
 
-@synthesize managedObjectContext=_managedObjectContext, searchController=_searchController, bmController=_bmController, searchBar=_searchBar, numberField=_numberField, doneButton=_doneButton;
+@synthesize managedObjectContext=_managedObjectContext, 
+				searchController=_searchController, 
+					bmController=_bmController, 
+					   searchBar=_searchBar, 
+					 numberField=_numberField, 
+					  doneButton=_doneButton;
 
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
@@ -24,7 +30,7 @@
     [super viewDidLoad];
 
 	// Set up the Song View
-    songView = [[SongViewController alloc] initWithNibName:@"SongView" bundle:nil];
+    songView = [[SongController alloc] init];
     songView.delegate = self;
     songView.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
 	
@@ -37,6 +43,7 @@
 	self.searchDisplayController.delegate = _searchController;
 	self.searchDisplayController.searchResultsDataSource = _searchController;
 	self.searchDisplayController.searchResultsDelegate = _searchController;
+	_searchController.searchDisplayer = self.searchDisplayController;
     
     // Init the bookmarks controller
     _bmController = [[BookmarksController alloc] initWithNibName:@"BookmarksController" bundle:nil];
@@ -50,22 +57,27 @@
 - (void)viewWillAppear:(BOOL)animated
 {
 	self.searchDisplayController.active = NO;
-	[_doneButton setEnabled:songView.isPopulated];
+	[_doneButton setEnabled:(songView.currentSong.currentSong != nil)];
 	[_numberField becomeFirstResponder];
 	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:animated];
 }
 
 
-- (void)songViewControllerDidFinish:(SongViewController *)controller
+- (void)songControllerDidFinish:(SongController *)controller
 {
     [self dismissModalViewControllerAnimated:YES];
+	// Prevent Sleep
+	[[UIApplication sharedApplication] setIdleTimerDisabled:NO];
 }
 
 - (IBAction)showSong:(id)sender
 {
-	if ( ! songView.isPopulated) return;
+	//NSLog(@"%@",songView.currentSong.currentSong);
+	if ( ! [songView isPopulated]) return;
     [self presentModalViewController:songView animated:YES];
 	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+	// Prevent Sleep
+	[[UIApplication sharedApplication] setIdleTimerDisabled:YES];
 }
 
 
@@ -89,19 +101,10 @@
 - (IBAction)userTouchedGo:(id)sender {
 	NSNumberFormatter *formatter = [[[NSNumberFormatter alloc] init] autorelease];
 	NSNumber *num = [formatter numberFromString:_numberField.text];
-	NSNumber *oldNum = nil;
-	if (songView.isPopulated) {
-		// Save the current number in case of failure
-		oldNum = songView.currentSong.number;
-	}
-	NSLog(@"Selected number %@", num);
-	[songView setSong:num];
-	if (songView.isPopulated) {
+	
+	if ([songView setSong:num]) {
 		[self showSong:nil];
 	} else {
-		if (oldNum) {
-			[songView setSong:oldNum];
-		}
 		// Shake that thang
 		CAKeyframeAnimation *wiggle = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation"];
 		wiggle.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:-0.05], [NSNumber numberWithFloat:0.05], nil];
@@ -110,7 +113,6 @@
 		wiggle.repeatCount = 5;
 		[_numberField.layer addAnimation:wiggle forKey:nil];
 	}
-	
 }
 
 
@@ -118,6 +120,8 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
+	if (isShaking)
+		return NO;
     // Return YES for supported orientations.
     return (interfaceOrientation == UIInterfaceOrientationPortrait ||
 			interfaceOrientation == UIInterfaceOrientationLandscapeLeft || 
@@ -152,9 +156,10 @@
 }
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
 	if (event.type == UIEventSubtypeMotionShake) {
+		NSNumber *num;
 		do {
-			[songView setSong:[NSNumber numberWithInt:(arc4random() % NUMSONGS)+1]];
-		} while ( ! songView.isPopulated);
+			num = [NSNumber numberWithInt:(arc4random() % NUMSONGS)+1];
+		} while ( ! [songView setSong:num]);
 		[self showSong:nil];
 	}
 	isShaking = NO;
