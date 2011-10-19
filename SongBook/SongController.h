@@ -10,7 +10,7 @@
 
 @class SongViewController, ChooserController, Song;
 
-@interface SongController : UIViewController {
+@interface SongController : UIViewController <UIScrollViewDelegate> {
 	BOOL displayingPrimary;
 }
 

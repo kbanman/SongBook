@@ -39,6 +39,11 @@
 	[self layoutVerses];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [(UIScrollView *)self.view setContentOffset:CGPointMake(0, 0)];
+}
+
 
 #pragma mark - Song Methods
 - (void)layoutVerses {
